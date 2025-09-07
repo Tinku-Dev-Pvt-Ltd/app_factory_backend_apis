@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const messages = require("../util/messages");
+const multer = require('multer');
 
 const response = (req, res) => {
 
@@ -22,7 +23,7 @@ const validateObjectId = async (req, res, next) => {
     try {
         console.log("AuthMiddleware => validateObjectId");
 
-        let id = req.body?.id || req.query?.id;
+        let id = req.body?.id || req.query?.id || req.params?.id;
 
         if (!id || id == "") {
             req.code = 0;
@@ -55,4 +56,14 @@ const validateObjectId = async (req, res, next) => {
     }
 };
 
-module.exports = { response, validateObjectId }
+var storage = multer.memoryStorage({
+    destination: function (req, file, cb) { cb(null, '') },
+    filename: function (req, file, cb) { cb(null, file.originalname) }
+})
+
+const upload = multer({
+    storage: storage,
+    // limits: { fileSize: 1000000 }
+})
+
+module.exports = { response, validateObjectId, upload }

@@ -45,7 +45,7 @@ router.patch("/remove_services", user_authenticate, validateObjectId, services()
 
 
 //subscription routes 
-router.get("/subscription_detail", user_authenticate, validateObjectId, subscription().details, response);
+router.get("/subscription/:id", user_authenticate, validateObjectId, subscription().details, response);
 router.get("/subscription_list", user_authenticate, subscription().get_list, response);
 
 

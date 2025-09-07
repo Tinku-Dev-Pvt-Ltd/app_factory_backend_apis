@@ -56,7 +56,7 @@ module.exports = () => {
   const details = async (req, res, next) => {
     console.log("content detail api hit successfully");
     try {
-      let { id } = req.query;
+      let { id } = req.params;
       let user_id = req.Id;
       let user_data = req.user_data;
 

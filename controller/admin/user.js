@@ -5,7 +5,7 @@ module.exports = () => {
     const details = async (req, res, next) => {
         console.log('user detail api hit successfully ✅');
         try {
-            let { id } = req.query;
+            let { id } = req.params;
 
             let exist_record = await user().fetch(id);
             if (exist_record == null) { throw ({ http_status: 400, msg: "not_found" }) }
@@ -70,7 +70,7 @@ module.exports = () => {
 
     const remove = async (req, res, next) => {
         try {
-            let { id } = req.body;
+            let { id } = req.params;
 
             let result = await user().update({ _id: id }, { is_deleted: true });
             if (result == null) { throw ({ http_status: 400, msg: "not_found" }) }
@@ -91,7 +91,8 @@ module.exports = () => {
 
     const active_inactive = async (req, res, next) => {
         try {
-            let { id, status } = req.body;
+            let { id } = req.params;
+            let { status } = req.body;
 
             let result = await user().update({ _id: id }, { "is_active": status }, { new: true });
             if (result == null) { throw ({ http_status: 400, msg: "not_found" }) }

@@ -45,7 +45,10 @@ module.exports = () => {
       const errors = await validationResult(req);
       if (!errors.isEmpty()) { throw ({ http_status: 400, msg: errors.errors[0].msg }) }
 
-      let admin = await admin_service().fetch_by_query({ email });
+      console.log('{ email:email } ==>', { email:email })
+
+      let admin = await admin_service().fetch_by_query({ email:email });
+      console.log('admin ==>', admin)
       if (admin == null) { throw ({ http_status: 401, msg: "not_found" }) }
 
       let passwordVerify = await checkPassword(password, admin.password);

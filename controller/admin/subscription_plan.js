@@ -28,7 +28,7 @@ module.exports = () => {
     const details = async (req, res, next) => {
         console.log('get subscription detail function call');
         try {
-            let { id } = req.query;
+           let { id } = req.params;
 
             let result = await subscription().fetch(id);
             if (result == null) { throw ({ http_status: 400, msg: "not_found" }) }
@@ -89,7 +89,7 @@ module.exports = () => {
 
     const remove = async (req, res, next) => {
         try {
-            let { id } = req.body;
+            let { id } = req.params;
 
             let data = await subscription().remove(id);
             if (data == null) { throw ({ http_status: 400, msg: "not_found" }) }
@@ -110,7 +110,8 @@ module.exports = () => {
     const change_status = async (req, res, next) => {
         console.log('get category stauts change function call');
         try {
-            let { id, status } = req.body;
+            let { id } = req.params;
+            let { status } = req.body;
 
             if (!status) { throw ({ http_status: 400, msg: "status_required" }) }
 

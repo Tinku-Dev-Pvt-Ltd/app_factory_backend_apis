@@ -1,13 +1,14 @@
 require('dotenv').config();
 const secretKey = process.env.SECRET_KEY;
-const otp_length = process.env.OTP_LEN; 
-const otp_expire_in = process.env.OTP_EXP; 
+const otp_length = process.env.OTP_LEN;
+const otp_expire_in = process.env.OTP_EXP;
 
 const admin = require('firebase-admin');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const mongoose = require('mongoose');
-const crypto = require('crypto')
+const crypto = require('crypto');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const ObjectId = mongoose.Types.ObjectId;
 
 
@@ -21,15 +22,25 @@ const messages = require("./messages.js");
 const serviceAccount = require('../util/welliva.json');
 admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
+let secret_key = process.env.AWS_SECRET_ACCESS_KEY;
+let access_key = process.env.AWS_ACCESS_KEY_ID;
+let bucket_name = process.env.AWS_BUCKET_NAME;
+let region_name = process.env.AWS_REGION;
+
+const s3 = new S3Client({
+    region: region_name,
+    credentials: { 'accessKeyId': access_key, 'secretAccessKey': secret_key, }
+});
+
 // Intialize crypto encryption
 // const new_hex = crypto.createHash('sha256').update('app_factory_143').digest('hex');
 // console.log('new ==>', new_hex)
 
-const keyBuffer = Buffer.from('fb41e1009337aae719ef45147898faffe4555b8aea650fcc1ab7a27097bc91ef'.trim(), 'hex'); 
+const keyBuffer = Buffer.from('fb41e1009337aae719ef45147898faffe4555b8aea650fcc1ab7a27097bc91ef'.trim(), 'hex');
 
 const createJWT = (payload) => {         // expires in 30 days
-    return jwt.sign(payload, secretKey); 
-}; 
+    return jwt.sign(payload, secretKey);
+};
 
 const hashPassword = async (password) => {
     const hash = await bcrypt.hash(password, 5);
@@ -101,26 +112,26 @@ const send_bulk_notification = async (title, discription, tokens) => {
     }
 }
 
-const send_mobile_otp = async(country_code, mobile, type, user_role, user_id)=>{
+const send_mobile_otp = async (country_code, mobile, type, user_role, user_id) => {
     console.log('send otp on mobile number is processing ...');
-    try{
+    try {
         let otp = generateOTP();
         const expired_at = new Date(Date.now() + otp_expire_in * 1000);
 
-        let otp_payload = {country_code, mobile, otp, type, user_role, expired_at, user_id }
+        let otp_payload = { country_code, mobile, otp, type, user_role, expired_at, user_id }
         await user_otp.create(otp_payload);
 
         return true;
     }
-    catch(err){
+    catch (err) {
         console.log('\n\n =-=-=-=-=-=- error =-=-=-=-=-=- ');
         console.log(err)
     }
 }
 
-const send_email_otp = async(email, type, user_role, user_id )=>{
+const send_email_otp = async (email, type, user_role, user_id) => {
     console.log('send otp on email number is processing ...');
-    try{
+    try {
         let otp = generateOTP();
         const expired_at = new Date(Date.now() + otp_expire_in * 1000);
 
@@ -128,25 +139,25 @@ const send_email_otp = async(email, type, user_role, user_id )=>{
 
         await user_otp.create(otp_payload);
     }
-    catch(err){
+    catch (err) {
         console.log('\n\n =-=-=-=-=-=- error =-=-=-=-=-=- ');
         console.log(err)
     }
 }
 
-const verify_otp = async(query, otp)=>{
+const verify_otp = async (query, otp) => {
     console.log('verify otp function call...')
-    try{
+    try {
 
         const record = await user_otp.findOne(query).sort({ createdAt: -1 });
 
         let msg = "otp_verified";
         if (!record || record?.otp !== otp) msg = "Invalid_otp"
         if (record?.expired_at < new Date()) msg = "otp_expired";
-    
-        return record == null ? null : { msg, role : record.user_role, user_id:record.user_id };
+
+        return record == null ? null : { msg, role: record.user_role, user_id: record.user_id };
     }
-    catch(err){
+    catch (err) {
         console.log('\n\n =-=-=-=-=-=- error =-=-=-=-=-=- ');
         console.log(err)
     }
@@ -165,7 +176,7 @@ const create_notification_payload = async (title, user_id, user_type, action_id,
             "title": title,
             "description": messages("en")['notification_discription'],
             "notification_type": 1,
-            "other_user_id":other_user_id,
+            "other_user_id": other_user_id,
             "user_id": user_id,
             "user_type": user_type,
             "action_id": action_id
@@ -191,24 +202,51 @@ function encrypt_data(data) {
         return null;
     }
 }
-  
+
 function decrypt_data(encryptedString) {
     try {
-      const [ivHex, encryptedHex] = encryptedString.split('.');
-      const iv = Buffer.from(ivHex, 'hex');
-      const encryptedText = Buffer.from(encryptedHex, 'hex');
-      const decipher = crypto.createDecipheriv('aes-256-cbc', keyBuffer, iv);
-      const decrypted = Buffer.concat([
-        decipher.update(encryptedText),
-        decipher.final()
-      ]);
-      return decrypted.toString('utf8');
+        const [ivHex, encryptedHex] = encryptedString.split('.');
+        const iv = Buffer.from(ivHex, 'hex');
+        const encryptedText = Buffer.from(encryptedHex, 'hex');
+        const decipher = crypto.createDecipheriv('aes-256-cbc', keyBuffer, iv);
+        const decrypted = Buffer.concat([
+            decipher.update(encryptedText),
+            decipher.final()
+        ]);
+        return decrypted.toString('utf8');
     } catch (error) {
-      console.log("Error in decrypt:", error);
-      return null;
+        console.log("Error in decrypt:", error);
+        return null;
     }
 }
 
+const upload_s3_file = async (file_name, buffer, mime_type) => {
+    console.log('upload s3 file continuee ...');
+    try {
+        let name = file_name.replace(/\s+/g, '-').replace(/[()]/g, '').toLowerCase();
+        const params = {
+            Bucket: bucket_name,
+            Key: `app_factory/${name}`,
+            ACL: "public-read",
+            Body: buffer,
+            ContentType: mime_type
+        };
+
+        const command = new PutObjectCommand(params);
+        const upload_result = await s3.send(command);
+
+        // console.log('\n =-=-=-=-=--=-=- data after upload file on s3 bucket cloud =-=-=-=-=--=-=- ',)
+        // console.log(upload_result);
+
+        const location = `https://${params.Bucket}.s3.${region_name}.amazonaws.com/${params.Key}`;
+        console.log('\n File uploaded successfully:', location);
+
+        return location;
+    } 
+    catch (err) {
+        console.log(err)
+    }
+}
 
 module.exports = {
     generateOTP,
@@ -223,5 +261,6 @@ module.exports = {
     send_bulk_notification,
     create_notification_payload,
     encrypt_data,
-    decrypt_data
+    decrypt_data,
+    upload_s3_file
 }

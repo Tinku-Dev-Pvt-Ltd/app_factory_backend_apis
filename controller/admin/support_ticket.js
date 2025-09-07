@@ -5,7 +5,7 @@ module.exports = () => {
     const details = async (req, res, next) => {
         console.log('get category detail function call');
         try {
-            let { id } = req.query;
+           let { id } = req.params;
 
             let result = await support_ticket().fetch(id);
             if (result == null) { throw ({ http_status: 400, msg: "not_found" }) }
@@ -71,7 +71,8 @@ module.exports = () => {
 
     const change_status = async (req, res, next) => {
         try {
-            let { id, reply } = req.body;
+            let { id } = req.params;
+            let { reply } = req.body;
 
             let data = await support_ticket().fetch(id);
             if (data == null) { throw ({ http_status: 400, msg: "not_found" }) }

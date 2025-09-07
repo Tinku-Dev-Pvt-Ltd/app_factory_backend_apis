@@ -1296,6 +1296,7 @@ const social_type = {
   const usage_limit_required = {  en : "usage_limit is required" }
   const description_required = { en: "description is required" }
   const category_id_required = { en : "Category id is required"}
+  const category_exist = { en : "You have already created category with this name"};
   const comment_msg = { en : "Comment on your post."}
   const like_msg = { en : "Like your post."}
   const dislike_msg = { en : "Dislike your post."}
@@ -1429,6 +1430,7 @@ const social_type = {
     usage_limit_required : usage_limit_required [lang],
     description_required: description_required[lang],
     category_id_required: category_id_required[lang],
+    category_exist:category_exist[lang],
     comment_msg : comment_msg[lang],
     like_msg : like_msg[lang],
     dislike_msg : dislike_msg[lang],

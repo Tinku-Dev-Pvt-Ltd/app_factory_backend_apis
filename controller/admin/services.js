@@ -46,7 +46,7 @@ module.exports = () => {
 
     const block_unblock = async (req, res, next) => {
         try {
-            let { id } = req.body;
+            let { id } = req.params;
 
             let data = await services().fetch(id);
             if (data == null) { throw ({ http_status: 400, msg: "not_found" }) }
@@ -70,7 +70,8 @@ module.exports = () => {
 
     const approved_reject = async (req, res, next) => {
         try {
-            let { id, status } = req.body;
+            let { id } = req.params;
+            let { status } = req.body;
 
             let result = await services().update({ _id: id }, { "is_approved": status }, { new: true });
             if (result == null) throw ({ http_stauts: 400, msg: "not_found" })

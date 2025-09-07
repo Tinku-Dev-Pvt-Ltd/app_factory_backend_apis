@@ -40,35 +40,6 @@ const generate_transaction = async (user_id, user_name, amount, transaction_type
     }
 }
 
-const generate_query = (type) => {
-    console.log('type ==>', type)
-
-    const now = new Date();
-    let start_date, end_date = new Date();
-
-    switch (type) {
-        case 1: // 1. From last minute (today)
-            start_date = new Date(now.setHours(0,0,0,0)); // from 12 AM
-            break;
-
-        case 2: // 2. Last 7 days
-            start_date = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
-            start_date.setHours(0, 0, 0, 0); // start of that day
-            break;
-
-        case 3: // 3. This month
-            start_date = new Date(now.getFullYear(), now.getMonth(), 1); // start of month
-            break;
-
-        default:
-            throw new Error("Invalid filter type");
-    }
-
-    return { "createdAt": { $gte: start_date, $lte: end_date } };
-}
-
-
 module.exports = {
     generate_transaction,
-    generate_query
 }
