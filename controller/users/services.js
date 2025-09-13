@@ -3,15 +3,15 @@ const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
-let services = require("../../service/services");
+let services = require("../../service/theme");
 
 module.exports = () => {
 
   const add_update = async (req, res, next) => {
     console.log("add_update content api call successfully");
     try {
-      let { id } = req.body;
-      let body = req.body;
+      let { id } = req.fields;
+      let body = req.fields;
       let user_id = req.Id;
       let { scheduled_time } = body;
 
@@ -68,15 +68,15 @@ module.exports = () => {
       req.data = exist_record[0];
       next();
 
-      let data = exist_record[0];
-      if (data?.user_id != user_id ) {
+      // let data = exist_record[0];
+      // if (data?.user_id != user_id ) {
 
-        await Promise.all([
-          services().update({ _id: id }, { total_views: (exist_record[0].total_views += 1) }),
-          create_notification_payload("view_msg", data.user_id, "user", data._id, user_data.first_name, user_id),
-          send_notification("view_msg", data.user_id, user_data.first_name),
-        ]);
-      }
+      //   await Promise.all([
+      //     services().update({ _id: id }, { total_views: (exist_record[0].total_views += 1) }),
+      //     create_notification_payload("view_msg", data.user_id, "user", data._id, user_data.first_name, user_id),
+      //     send_notification("view_msg", data.user_id, user_data.first_name),
+      //   ]);
+      // }
     } catch (err) {
       console.log(err);
       req.http_status = err.http_status || 500;
@@ -136,7 +136,7 @@ module.exports = () => {
 
   const remove = async (req, res, next) => {
     try {
-      let { id } = req.body;
+      let { id } = req.fields;
 
       let result = await services().update({ _id: id }, { is_deleted: true });
       if (result == null) { throw { http_status: 400, msg: "not_found" }; }

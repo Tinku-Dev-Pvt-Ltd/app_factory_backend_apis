@@ -1,5 +1,3 @@
-const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId;
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const admin = require('../service/admin');
@@ -21,7 +19,6 @@ const admin_token = async (req, res, next) => {
         req.data = user_data;
         req.role = "admin";
         req.lang = 'en';
-
         next()
     }
     catch (error) {

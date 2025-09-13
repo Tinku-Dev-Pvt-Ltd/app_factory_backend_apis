@@ -13,6 +13,8 @@ const cms = require('../controller/admin/cms');
 const notification = require('../controller/common/notification');
 const services = require('../controller/users/services');
 const category = require('../controller/admin/category');
+const themes = require('../controller/admin/theme');
+const homepage = require('../controller/users/homepage');
 const subscription = require('../controller/admin/subscription_plan');
 
 
@@ -40,7 +42,6 @@ router.post("/add_services", user_authenticate, services().add_update, response)
 router.put("/edit_services", user_authenticate, validateObjectId, services().add_update, response);
 router.get("/services_detail", user_authenticate, validateObjectId, services().details, response);
 router.get("/services_list", user_authenticate, services().get_list, response);
-// router.get("/recent_services_list", user_authenticate, services().recent_list, response);
 router.patch("/remove_services", user_authenticate, validateObjectId, services().remove, response);
 
 
@@ -49,10 +50,14 @@ router.get("/subscription/:id", user_authenticate, validateObjectId, subscriptio
 router.get("/subscription_list", user_authenticate, subscription().get_list, response);
 
 
+router.get("/theme_list", user_authenticate, themes().get_list, response);
+router.get("/theme/:id", user_authenticate, validateObjectId, themes().details, response);
+
+
 // other listing and detail :-
 router.get("/cms_detail", cms().details, response);
 router.get("/category_list", user_authenticate, category().get_list, response);
-router.get("/get_credential", user_authenticate, auth().getS3Credentials, response);
+router.get("/homepage", user_authenticate, homepage().homepage, response);
 
 
 

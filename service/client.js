@@ -1,50 +1,50 @@
-const user = require("../schema/user");
+const client = require("../schema/client");
 
 module.exports = () => {
 
   const add = (data) => {
     return new Promise((resolve, reject)=>{
-      user.create(data).then(resolve).catch(reject);
+      client.create(data).then(resolve).catch(reject);
     });
   };
 
   const fetch = (id) => {
     return new Promise((resolve, reject)=>{
-      user.findById(id).then(resolve).catch(reject);
+      client.findById(id).then(resolve).catch(reject);
     });
   };
 
   const fetch_by_query = (query) => {
     return new Promise((resolve, reject)=>{
-      let orm = user.findOne(query,'-__v -updatedAt').sort({ _id: -1 });
+      let orm = client.findOne(query,'-__v -updatedAt').sort({ _id: -1 });
       orm.then(resolve).catch(reject);
     });
   };
 
   const update = (query, data) => {
     return new Promise((resolve, reject)=>{
-      user.findOneAndUpdate(query, data, { new: true }).then(resolve).catch(reject);
+      client.findOneAndUpdate(query, data, { new: true }).then(resolve).catch(reject);
     });
   };
 
   const get_all = (query, skip, limit, projection) => {
       return new Promise((resolve, reject)=>{
           let result;
-          if(skip != null && limit != null) result = user.find(query, projection).sort({ _id: -1 }).skip(skip).limit(limit);
-          else result = user.find(query, projection).sort({ _id: -1 });
+          if(skip != null && limit != null) result = client.find(query, projection).sort({ _id: -1 }).skip(skip).limit(limit);
+          else result = client.find(query, projection).sort({ _id: -1 });
           result.then(resolve).catch(reject);
       });
   };
 
   const count = (query) => {
     return new Promise((resolve, reject)=>{
-      user.countDocuments(query).then(resolve).catch(reject);
+      client.countDocuments(query).then(resolve).catch(reject);
     });
   };
 
   const remove = (id) => {
     return new Promise((resolve, reject)=>{
-      user.findOneAndDelete({ '_id': id }).then(resolve).catch(reject);
+      client.findOneAndDelete({ '_id': id }).then(resolve).catch(reject);
     });
   };
 

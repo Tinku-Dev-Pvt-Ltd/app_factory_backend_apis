@@ -26,11 +26,32 @@ module.exports = () => {
     });
   };
 
-  const get_all = (query, skip, limit, projection) => {
+  const get_all = (query, pagination) => {
     return new Promise((resolve, reject)=>{
-       let result;
-       if(skip != null && limit != null) result = category.find(query,projection).sort({ _id: -1 }).skip(skip).limit(limit);
-       else result = category.find(query,projection).sort({ _id: -1 });
+       let pipeline = [
+        { $match : query },
+        { $sort: { _id : -1 } },
+        ...pagination,
+        { $lookup : {
+            from : "categories",
+            let : { local_field: "$parent_id" }, 
+            pipeline : [
+              {$match:{$expr:{$eq:["$_id","$$local_field"]}}},
+              {$project:{ name:1 }}
+            ],
+            as: "parent_data"
+        }},
+        { $unwind : { path : "$parent_data", preserveNullAndEmptyArrays : true } },
+        { $project : {
+            "name"        : 1,
+            "image"       : 1,
+            "parent_id"   : 1,
+            "parent_name" : "$parent_data.name",
+            "is_active"   : 1,
+        } },
+       ];
+       
+       let result = category.aggregate(pipeline);
        result.then(resolve).catch(reject);
     });
   };

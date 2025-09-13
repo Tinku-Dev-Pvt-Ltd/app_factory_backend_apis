@@ -7,7 +7,8 @@ const admin = require('firebase-admin');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const mongoose = require('mongoose');
-const crypto = require('crypto');
+// const crypto = require('crypto');
+const fs = require('fs');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -36,7 +37,7 @@ const s3 = new S3Client({
 // const new_hex = crypto.createHash('sha256').update('app_factory_143').digest('hex');
 // console.log('new ==>', new_hex)
 
-const keyBuffer = Buffer.from('fb41e1009337aae719ef45147898faffe4555b8aea650fcc1ab7a27097bc91ef'.trim(), 'hex');
+// const keyBuffer = Buffer.from('fb41e1009337aae719ef45147898faffe4555b8aea650fcc1ab7a27097bc91ef'.trim(), 'hex');
 
 const createJWT = (payload) => {         // expires in 30 days
     return jwt.sign(payload, secretKey);
@@ -188,52 +189,57 @@ const create_notification_payload = async (title, user_id, user_type, action_id,
     } catch (err) { console.log(err) }
 }
 
-function encrypt_data(data) {
-    try {
+// function encrypt_data(data) {
+//     try {
 
-        const iv = crypto.randomBytes(16);
-        const cipher = crypto.createCipheriv('aes-256-cbc', keyBuffer, iv);
-        const json_string = JSON.stringify(data);
-        const encrypted = Buffer.concat([cipher.update(json_string, 'utf8'), cipher.final()]);
-        return iv.toString('hex') + '.' + encrypted.toString('hex');
+//         const iv = crypto.randomBytes(16);
+//         const cipher = crypto.createCipheriv('aes-256-cbc', keyBuffer, iv);
+//         const json_string = JSON.stringify(data);
+//         const encrypted = Buffer.concat([cipher.update(json_string, 'utf8'), cipher.final()]);
+//         return iv.toString('hex') + '.' + encrypted.toString('hex');
 
-    } catch (error) {
-        console.log("Error in encrypt:", error);
-        return null;
-    }
-}
+//     } catch (error) {
+//         console.log("Error in encrypt:", error);
+//         return null;
+//     }
+// }
 
-function decrypt_data(encryptedString) {
-    try {
-        const [ivHex, encryptedHex] = encryptedString.split('.');
-        const iv = Buffer.from(ivHex, 'hex');
-        const encryptedText = Buffer.from(encryptedHex, 'hex');
-        const decipher = crypto.createDecipheriv('aes-256-cbc', keyBuffer, iv);
-        const decrypted = Buffer.concat([
-            decipher.update(encryptedText),
-            decipher.final()
-        ]);
-        return decrypted.toString('utf8');
-    } catch (error) {
-        console.log("Error in decrypt:", error);
-        return null;
-    }
-}
+// function decrypt_data(encryptedString) {
+//     try {
+//         const [ivHex, encryptedHex] = encryptedString.split('.');
+//         const iv = Buffer.from(ivHex, 'hex');
+//         const encryptedText = Buffer.from(encryptedHex, 'hex');
+//         const decipher = crypto.createDecipheriv('aes-256-cbc', keyBuffer, iv);
+//         const decrypted = Buffer.concat([
+//             decipher.update(encryptedText),
+//             decipher.final()
+//         ]);
+//         return decrypted.toString('utf8');
+//     } catch (error) {
+//         console.log("Error in decrypt:", error);
+//         return null;
+//     }
+// }
 
-const upload_s3_file = async (file_name, buffer, mime_type) => {
+const upload_s3_file = async (file) => {
     console.log('upload s3 file continuee ...');
+    // console.log('\n <================== file ==================>')
+    // console.log(file)
     try {
-        let name = file_name.replace(/\s+/g, '-').replace(/[()]/g, '').toLowerCase();
+        let name = file.name.replace(/\s+/g, '-').replace(/[()]/g, '').toLowerCase();
+        let stream = fs.createReadStream(file.path);
+        let mime_type = file.type;
+
         const params = {
             Bucket: bucket_name,
             Key: `app_factory/${name}`,
             ACL: "public-read",
-            Body: buffer,
+            Body: stream,
             ContentType: mime_type
         };
 
         const command = new PutObjectCommand(params);
-        const upload_result = await s3.send(command);
+        // const upload_result = await s3.send(command);
 
         // console.log('\n =-=-=-=-=--=-=- data after upload file on s3 bucket cloud =-=-=-=-=--=-=- ',)
         // console.log(upload_result);
@@ -242,7 +248,7 @@ const upload_s3_file = async (file_name, buffer, mime_type) => {
         console.log('\n File uploaded successfully:', location);
 
         return location;
-    } 
+    }
     catch (err) {
         console.log(err)
     }
@@ -260,7 +266,7 @@ module.exports = {
     send_notification,
     send_bulk_notification,
     create_notification_payload,
-    encrypt_data,
-    decrypt_data,
+    // encrypt_data,
+    // decrypt_data,
     upload_s3_file
 }

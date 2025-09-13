@@ -72,7 +72,7 @@ module.exports = () => {
     const change_status = async (req, res, next) => {
         try {
             let { id } = req.params;
-            let { reply } = req.body;
+            let { reply } = req.fields;
 
             let data = await support_ticket().fetch(id);
             if (data == null) { throw ({ http_status: 400, msg: "not_found" }) }

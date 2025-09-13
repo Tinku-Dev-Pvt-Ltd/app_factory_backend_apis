@@ -26,16 +26,15 @@ module.exports = () => {
         });
     };
 
-    const get_all = (query, skip, limit) => {
+    const get_all = (query, pagination) => {
         return new Promise(function (resolve, reject) {
 
             let pipeline = [
                 { $match: query },
                 { $sort: { _id: -1 } },
+                ...pagination,
                 { $project: { __v: 0, updatedAt: 0 } },
             ]
-
-            if (skip !== null && limit !== null) pipeline.push({ $skip: skip }, { $limit: limit })
 
             let orm = subscription.aggregate(pipeline)
             orm.then(resolve).catch(reject);

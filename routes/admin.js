@@ -1,21 +1,21 @@
 const router = require("express").Router();
-const { response, validateObjectId, upload } = require('../middleware/response');
-const { admin_token, upload_file } = require('../middleware/validateToken')
+const { response, validateObjectId } = require('../middleware/response');
+const { admin_token } = require('../middleware/validateToken')
 
 
 const { email_login_validator, forgot_validation, change_password_validation, email_otp_Validator } = require('../validator/auth');
 const { cms_validation, user_device_validator } = require('../validator/common');
 
 
-
 const auth = require("../controller/admin/auth");
 const common = require('../controller/common/user');
 const cms = require('../controller/admin/cms');
 const user = require('../controller/admin/user');
+const client = require('../controller/admin/client');
 const ticket = require('../controller/admin/support_ticket');
 const category = require('../controller/admin/category');
-const services = require('../controller/admin/services');
-const user_services = require('../controller/users/services');
+const themes = require('../controller/admin/theme');
+const staff = require('../controller/admin/staff');
 const subscription = require('../controller/admin/subscription_plan');
 
 
@@ -29,16 +29,24 @@ router.put("/reset_password", admin_token, auth().reset_password, response);
 router.put("/change_password", admin_token, change_password_validation, auth().change_password, response);
 router.post('/update_device_token', admin_token, user_device_validator, common().update_device_token, response);
 router.get("/logout", admin_token, common().logout, response);
-router.get("/get_credential", common().getS3Credentials, response);
 
 
 // category routes 
-router.post("/category", admin_token, upload.single('image'), category().add_update, response);
+router.post("/category", admin_token, category().add_update, response);
 router.put("/category", admin_token, validateObjectId, category().add_update, response);
 router.get("/category_list", admin_token, category().get_list, response);
 router.get("/category/:id", admin_token, validateObjectId, category().details, response);
 router.patch("/category/:id", admin_token, validateObjectId, category().change_status, response);
 router.delete("/category/:id", admin_token, validateObjectId, category().remove, response);
+
+
+// staff member routes 
+router.post("/staff", admin_token, staff().add_update, response);
+router.put("/staff", admin_token, validateObjectId, staff().add_update, response);
+router.get("/staff_list", admin_token, staff().get_list, response);
+router.get("/staff/:id", admin_token, validateObjectId, staff().details, response);
+router.patch("/staff/:id", admin_token, validateObjectId, staff().change_status, response);
+router.delete("/staff/:id", admin_token, validateObjectId, staff().remove, response);
 
 
 // subscription routes 
@@ -57,6 +65,15 @@ router.patch("/user/:id", admin_token, validateObjectId, user().active_inactive,
 router.delete("/user/:id", admin_token, validateObjectId, user().remove, response);
 
 
+// Manage client
+router.post("/client", admin_token, client().update_client, response);
+router.put("/client", admin_token, validateObjectId, client().update_client, response);
+router.get('/client_list', admin_token, client().get_list, response);
+router.get('/client/:id', admin_token, client().details, response);
+router.patch("/client/:id", admin_token, validateObjectId, client().active_inactive, response);
+router.delete("/client/:id", admin_token, validateObjectId, client().remove, response);
+
+
 // Manage support ticket
 router.get('/ticket_list', admin_token, ticket().get_list, response);
 router.get('/ticket/:id', admin_token, ticket().details, response);
@@ -64,10 +81,11 @@ router.patch("/ticket/:id", admin_token, validateObjectId, ticket().change_statu
 
 
 // manage service routes
-router.get("/service_list", admin_token, services().get_list, response);
-router.get("/service/:id", admin_token, validateObjectId, user_services().details, response);
-router.put("/service/:id", admin_token, validateObjectId, services().approved_reject, response);
-router.patch("/service/:id", admin_token, validateObjectId, services().block_unblock, response);
+router.post("/theme", themes().add_update, response);
+router.put("/theme", admin_token, validateObjectId, themes().add_update, response);
+router.get("/theme_list", admin_token, themes().get_list, response);
+router.get("/theme/:id", admin_token, validateObjectId, themes().details, response);
+router.delete("/theme/:id", admin_token, validateObjectId, themes().remove, response);
 
 
 // routes for cms [ manage cms ]

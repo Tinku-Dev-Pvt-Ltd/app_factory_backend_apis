@@ -1,4 +1,4 @@
-const { createJWT, generateOTP, hashPassword, verify_otp, checkPassword, send_email_otp } = require("../../util/helper.js");
+const { createJWT, hashPassword, verify_otp, checkPassword, send_email_otp } = require("../../util/helper.js");
 const { validationResult } = require('express-validator');
 
 const admin_service = require("../../service/admin.js");
@@ -7,7 +7,7 @@ module.exports = () => {
 
   const register = async (req, res, next) => {
     try {
-      let { email, password, name } = req.body;
+      let { email, password, name } = req.fields;
 
       const errors = await validationResult(req);
       if (!errors.isEmpty()) { throw ({ http_status: 400, msg: errors.errors[0].msg }) }
@@ -21,10 +21,8 @@ module.exports = () => {
         data = { email, password, name };
 
         let admin = await admin_service().registerAdmin(data);
-        let token = await createJWT({ 'id': admin._id, isAdmin: true, role: "admin" });
-        let result = await admin_service().update_by_id(admin._id, { token });
 
-        req.data = result;
+        req.data = {};
         req.msg = 'Success';
         req.code = 1;
         req.http_status = 200;
@@ -40,12 +38,13 @@ module.exports = () => {
 
   const login = async (req, res, next) => {
     try {
-      var { email, password } = req.body;
+      var { email, password } = req.fields;
+
+      console.log('\n ======== req.fields ===========');
+      console.log(req.fields)
 
       const errors = await validationResult(req);
       if (!errors.isEmpty()) { throw ({ http_status: 400, msg: errors.errors[0].msg }) }
-
-      console.log('{ email:email } ==>', { email:email })
 
       let admin = await admin_service().fetch_by_query({ email:email });
       console.log('admin ==>', admin)
@@ -70,7 +69,7 @@ module.exports = () => {
 
   const forgot_password = async (req, res, next) => {
     try {
-      let { email } = req.body;
+      let { email } = req.fields;
 
       const errors = await validationResult(req);
       if (!errors.isEmpty()) { throw ({ http_status: 400, msg: errors.errors[0].msg }) }
@@ -95,7 +94,7 @@ module.exports = () => {
 
   const verify_user_otp = async (req, res, next) => {
     try {
-      let { email, otp } = req.body;
+      let { email, otp } = req.fields;
 
       const errors = await validationResult(req);
       if (!errors.isEmpty()) { throw ({ http_status: 400, msg: errors.errors[0].msg }) }
@@ -124,7 +123,7 @@ module.exports = () => {
   const reset_password = async (req, res, next) => {
     console.log('reset password function call successfully')
     try {
-      let { password } = req.body;
+      let { password } = req.fields;
       let userId = req.Id;
 
       if (!password) { throw ({ http_status: 400, msg: "password_required" }) }
@@ -150,7 +149,7 @@ module.exports = () => {
   const change_password = async (req, res, next) => {
     console.log("AdminController => changePassword");
     try {
-      let { current_password, new_password } = req.body;
+      let { current_password, new_password } = req.fields;
       let id = req.Id;
       let data = req.data
 

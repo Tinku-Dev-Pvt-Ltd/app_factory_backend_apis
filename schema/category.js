@@ -12,6 +12,9 @@ const category_schema = new Schema({
 },
 {timestamps : true});
 
+// Define index
+category_schema.index({ parent_id: 1 });
+
 var categories = mongoose.model("categories", category_schema);
 module.exports = categories;
    

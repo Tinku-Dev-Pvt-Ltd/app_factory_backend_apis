@@ -5,7 +5,7 @@ module.exports = () => {
 
   const update_cms = async (req, res, next) => {
     try {
-      let { title, discription, type } = req.body;
+      let { title, discription, type } = req.fields;
 
       const errors = await validationResult(req);
       if (!errors.isEmpty()) { throw ({ http_status: 400, msg: errors.errors[0].msg }) }

@@ -5,7 +5,7 @@ module.exports = () => {
 
     const add_update = async (req, res, next) => {
         try {
-            let body = req.body;
+            let body = req.fields;
             let { id } = body;
 
             let result = null;
@@ -53,12 +53,15 @@ module.exports = () => {
         try {
             let { search, page, limit, status } = req.query;
             let role = req.role;
+            let skip = null;
 
             page = page ? parseInt(page) : null;
             limit = limit ? parseInt(limit) : null;
-            const skip = parseInt((page - 1) * limit);
+            if(page != null && limit != null) skip = parseInt((page - 1) * limit);
 
             let query = {};
+            let pagination = skip != null ? [{ $skip: skip }, { $limit: limit }] : [];
+
             if (search) { query.title = { $regex: ".*" + search + ".*", $options: "i" } }
             if (status) query.is_active = status == 'true' ? true : status == 'false' ? false : true;
             if (role == 'user') query.is_active = true;
@@ -67,7 +70,7 @@ module.exports = () => {
             console.log(query)
 
             let [result, count] = await Promise.all([
-                subscription().get_all(query, skip, limit, "-__v -updatedAt"),
+                subscription().get_all(query, pagination),
                 subscription().count(query)
             ]);
 
@@ -111,7 +114,7 @@ module.exports = () => {
         console.log('get category stauts change function call');
         try {
             let { id } = req.params;
-            let { status } = req.body;
+            let { status } = req.fields;
 
             if (!status) { throw ({ http_status: 400, msg: "status_required" }) }
 
