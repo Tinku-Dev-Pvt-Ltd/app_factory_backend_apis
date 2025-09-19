@@ -14,6 +14,7 @@ const user = require('../controller/admin/user');
 const client = require('../controller/admin/client');
 const ticket = require('../controller/admin/support_ticket');
 const category = require('../controller/admin/category');
+const sub_category = require('../controller/admin/sub_category');
 const themes = require('../controller/admin/theme');
 const staff = require('../controller/admin/staff');
 const subscription = require('../controller/admin/subscription_plan');
@@ -38,6 +39,15 @@ router.get("/category_list", admin_token, category().get_list, response);
 router.get("/category/:id", admin_token, validateObjectId, category().details, response);
 router.patch("/category/:id", admin_token, validateObjectId, category().change_status, response);
 router.delete("/category/:id", admin_token, validateObjectId, category().remove, response);
+
+
+// sub category routes 
+router.post("/sub_category", admin_token, sub_category().add_update, response);
+router.put("/sub_category", admin_token, validateObjectId, sub_category().add_update, response);
+router.get("/sub_category_list", admin_token, sub_category().get_list, response);
+router.get("/sub_category/:id", admin_token, validateObjectId, sub_category().details, response);
+router.patch("/sub_category/:id", admin_token, validateObjectId, sub_category().change_status, response);
+router.delete("/sub_category/:id", admin_token, validateObjectId, sub_category().remove, response);
 
 
 // staff member routes 

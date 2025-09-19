@@ -11,7 +11,7 @@ module.exports = () => {
         try {
             let body = req.fields;
             let file = req.files.image;
-            let { id, name, parent_id = null } = body;
+            let { id, name } = body;
 
             if (!name) throw ({ http_status: 400, msg: "name_required" });
 
@@ -21,7 +21,6 @@ module.exports = () => {
             if (category_exist != null) throw ({ http_status: 401, msg: "category_exist" });
 
             let payload = { name }
-            if (!['', "", null].includes(parent_id)) payload.parent_id = parent_id;
             if (file) {
                 console.log('\n file found to upload on s3 bucket cloud')
                 let s3_result = await upload_s3_file(file);
@@ -75,7 +74,7 @@ module.exports = () => {
     const get_list = async (req, res, next) => {
         console.log("category listing api hit successfully");
         try {
-            let { search, page, limit, status, parent_id, type } = req.query;
+            let { search, page, limit, status } = req.query;
             let role = req.role;
             let skip = null;
 
@@ -86,17 +85,13 @@ module.exports = () => {
             let query = { is_deleted: false };
             if (search) { query.name = { $regex: ".*" + search + ".*", $options: "i" } }
             if (status) query.is_active = status == 'true' ? true : status == 'false' ? false : true;
-            if (parent_id && !type) query.parent_id = new ObjectId(parent_id)
-            if (type == '1' && !parent_id) query.parent_id = null;                   // for getting all category
-            if (type == '2' && !parent_id) query.parent_id = { $ne: null };          // for getting all sub category
             if (role == 'user') query.is_active = true;
 
             console.log(' ----------------------- your final query is -------------------')
             console.log(query)
 
-            let pagination = skip != null ? [{$skip : skip}, {$limit : limit}] : [];
             let [result, count] = await Promise.all([
-                category().get_all(query, pagination),
+                category().get_all(query, skip, limit),
                 category().count(query)
             ]);
 

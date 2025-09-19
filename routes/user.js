@@ -13,6 +13,7 @@ const cms = require('../controller/admin/cms');
 const notification = require('../controller/common/notification');
 const services = require('../controller/users/services');
 const category = require('../controller/admin/category');
+const sub_category = require('../controller/admin/sub_category');
 const themes = require('../controller/admin/theme');
 const homepage = require('../controller/users/homepage');
 const subscription = require('../controller/admin/subscription_plan');
@@ -57,7 +58,8 @@ router.get("/theme/:id", user_authenticate, validateObjectId, themes().details, 
 // other listing and detail :-
 router.get("/cms_detail", cms().details, response);
 router.get("/category_list", user_authenticate, category().get_list, response);
-router.get("/homepage", user_authenticate, homepage().homepage, response);
+router.get("/sub_category_list", user_authenticate, sub_category().get_list, response);
+router.get("/homepage", homepage().homepage, response);
 
 
 
