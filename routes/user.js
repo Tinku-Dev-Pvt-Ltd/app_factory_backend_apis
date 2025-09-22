@@ -4,7 +4,7 @@ const { user_authenticate, optional_token } = require('../middleware/validateTok
 
 // validators :-
 const { email_otp_Validator, social_login_validator, email_login_validator } = require('../validator/auth');
-const { user_device_validator } = require("../validator/common");
+const { user_device_validator, query_validator } = require("../validator/common");
 
 
 // Controller :- 
@@ -15,6 +15,7 @@ const services = require('../controller/users/services');
 const category = require('../controller/admin/category');
 const sub_category = require('../controller/admin/sub_category');
 const themes = require('../controller/admin/theme');
+const inquery = require('../controller/common/inquery');
 const homepage = require('../controller/users/homepage');
 const subscription = require('../controller/admin/subscription_plan');
 
@@ -28,6 +29,7 @@ router.post("/verify_otp", email_otp_Validator, auth().verify_user_otp, response
 router.post('/update_device_token', user_device_validator,user_authenticate, auth().update_device_token, response);
 router.get("/get_profile", user_authenticate, auth().get_profile, response);
 router.post('/raise_ticket', user_authenticate, auth().raise_ticket, response);
+router.post('/inquery',query_validator, inquery().add, response);
 router.delete('/delete_account', user_authenticate, auth().delete_account, response);
 router.post("/logout", user_authenticate, auth().logout, response);
 

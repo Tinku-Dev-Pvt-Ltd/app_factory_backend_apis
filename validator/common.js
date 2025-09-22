@@ -54,8 +54,26 @@ const user_device_validator = [
         .notEmpty()
 ];
 
+const query_validator = [
+
+    check( "country_code",  "country_code_required") .notEmpty(),
+    check( "mobile",        "mobile_required")       .notEmpty(),
+    check( "theme_id",      "theme_id_required")     .notEmpty(),
+    check( "theme_id",      "invalid_theme_id")      .isMongoId()
+] 
+
+const assign_staff_validator = [
+
+    check(" staff_id", "staff_id_required")     .notEmpty(),
+    check( "staff_id", "invalid_staff_id")      .notEmpty(),
+    check( "query_id", "query_id_required")     .notEmpty(),
+    check( "query_id", "invalid_query_id")      .isMongoId()
+] 
+
 module.exports = {
     cms_validation,
     user_device_validator,
-    status_validation
+    status_validation,
+    query_validator,
+    assign_staff_validator
 }

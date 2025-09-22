@@ -67,8 +67,14 @@ module.exports = () => {
             as: "category_data"
         }},
         { $unwind: { path: "$category_data", preserveNullAndEmptyArrays: true } },
-        {
-          $project: {
+        { $lookup: {
+            from: "sub_categories",
+            let: { local_id: "$sub_category_id" },
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$local_id"] } } }],
+            as: "sub_category_data"
+        }},
+        { $unwind: { path: "$sub_category_data", preserveNullAndEmptyArrays: true } },
+        { $project: {
             "_id": 1,
             "uniq_id": 1,
             "title": 1,
@@ -76,6 +82,9 @@ module.exports = () => {
             "category_name": "$category_data.name",
             "category_image": "$category_data.image",
             "category_id": 1,
+            "sub_category_name": "$sub_category_data.name",
+            "sub_category_image": "$sub_category_data.image",
+            "sub_category_id": 1,
             "thumbnail": 1,
             "meta_title" : 1,
             "meta_description" : 1,

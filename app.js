@@ -9,15 +9,15 @@ const { mongodb } = require("./database/db");
 const PORT = process.env.PORT;
 const numCPUs = os.cpus().length;
 
-if (cluster.isPrimary) {
-  for (let i = 0; i < numCPUs; i++) { cluster.fork(); }   // @author : Yash, Note :- create worker as cpu number
+// if (cluster.isPrimary) {
+//   for (let i = 0; i < numCPUs; i++) { cluster.fork(); }   // @author : Yash, Note :- create worker as cpu number
 
-  cluster.on("exit", (worker, code, signal) => {      // Agar worker crash ho jaye to restart ho jaye
-    console.log(`Worker ${worker.process.pid} died. Starting a new one...`);
-    cluster.fork();
-  });
-}
-else {
+//   cluster.on("exit", (worker, code, signal) => {      // Agar worker crash ho jaye to restart ho jaye
+//     console.log(`Worker ${worker.process.pid} died. Starting a new one...`);
+//     cluster.fork();
+//   });
+// }
+// else {
   const app = express();
 
   mongodb(process.env.DB_URL);   
@@ -44,4 +44,4 @@ else {
   app.listen(PORT, () => {
     console.log(`Worker ${process.pid} is listening on port ${PORT}`);
   });
-}
+// }

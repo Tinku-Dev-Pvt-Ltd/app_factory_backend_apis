@@ -4,7 +4,7 @@ const { admin_token } = require('../middleware/validateToken')
 
 
 const { email_login_validator, forgot_validation, change_password_validation, email_otp_Validator } = require('../validator/auth');
-const { cms_validation, user_device_validator } = require('../validator/common');
+const { cms_validation, user_device_validator, assign_staff_validator } = require('../validator/common');
 
 
 const auth = require("../controller/admin/auth");
@@ -17,6 +17,7 @@ const category = require('../controller/admin/category');
 const sub_category = require('../controller/admin/sub_category');
 const themes = require('../controller/admin/theme');
 const staff = require('../controller/admin/staff');
+const inquery = require('../controller/common/inquery');
 const subscription = require('../controller/admin/subscription_plan');
 
 
@@ -73,6 +74,13 @@ router.get('/user_list', admin_token, user().get_list, response);
 router.get('/user/:id', admin_token, user().details, response);
 router.patch("/user/:id", admin_token, validateObjectId, user().active_inactive, response);
 router.delete("/user/:id", admin_token, validateObjectId, user().remove, response);
+
+
+// manage inquery
+router.get('/inquery_list', admin_token, inquery().get_list, response);
+router.get('/inquery/:id', admin_token, inquery().details, response);
+router.patch("/inquery/:id", admin_token, validateObjectId, inquery().change_status, response);
+router.put("/inquery/:id", admin_token, assign_staff_validator, inquery().assign_staff, response);
 
 
 // Manage client

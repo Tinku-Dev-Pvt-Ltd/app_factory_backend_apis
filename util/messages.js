@@ -1313,7 +1313,13 @@ const social_type = {
   const challenge_accepted = {en : "has accepted your challenge."};
   const user_won_challenge = {en : "is won this challenge"};
   const added_money = {en : "Amount is successfully added into your wallet."};
-  const withdraw_money = {en : "Amount is successfully withdraw from your wallet."};
+  const staff_id_required = {en : "Staff id is required."};
+  const invalid_staff_id = {en : "Invalid staff id."};
+  const query_id_required = {en : "Query id is required."};
+  const invalid_query_id = {en : "Invalid query id."};
+  const theme_id_required = {en: "Theme id required"};
+  const invalid_theme_id = {en: "Invalid theme id"};
+  const staff_not_found = { en:"Staff member not found"};
 
   return {
 
@@ -1446,7 +1452,13 @@ const social_type = {
     challenge_already_running:challenge_already_running[lang],
     challenge_accepted: challenge_accepted[lang],
     user_won_challenge: user_won_challenge[lang],
-    added_money: added_money[lang],
-    withdraw_money: withdraw_money[lang],
+    added_money: added_money[lang], 
+    staff_id_required: staff_id_required[lang],
+    invalid_staff_id: invalid_staff_id[lang],
+    query_id_required: query_id_required[lang],
+    invalid_query_id: invalid_query_id[lang],
+    theme_id_required:theme_id_required[lang],
+    invalid_theme_id:invalid_theme_id[lang],
+    staff_not_found:staff_not_found[lang]
   };
 };
