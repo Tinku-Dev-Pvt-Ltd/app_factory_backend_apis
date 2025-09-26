@@ -10,7 +10,7 @@ module.exports = () => {
 
   const fetch = (id) => {
     return new Promise((resolve, reject)=>{
-      client.findById(id).then(resolve).catch(reject);
+      client.findById(id, '-__v -updatedAt -password').then(resolve).catch(reject);
     });
   };
 

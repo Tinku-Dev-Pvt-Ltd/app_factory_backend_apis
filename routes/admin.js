@@ -18,7 +18,9 @@ const sub_category = require('../controller/admin/sub_category');
 const themes = require('../controller/admin/theme');
 const staff = require('../controller/admin/staff');
 const inquery = require('../controller/common/inquery');
+const assign_product = require('../controller/admin/assign_product');
 const subscription = require('../controller/admin/subscription_plan');
+const { assign_theme } = require("../validator/project");
 
 
 
@@ -69,11 +71,13 @@ router.patch("/subscription/:id", admin_token, subscription().change_status, res
 router.delete("/subscription/:id", admin_token, validateObjectId, subscription().remove, response);
 
 
-// Manage user
-router.get('/user_list', admin_token, user().get_list, response);
-router.get('/user/:id', admin_token, user().details, response);
-router.patch("/user/:id", admin_token, validateObjectId, user().active_inactive, response);
-router.delete("/user/:id", admin_token, validateObjectId, user().remove, response);
+// Manage user ( #Not in used anymore)
+// router.post('/user', admin_token, common().update_profile, response);
+// router.put('/user', admin_token, common().update_profile, response);
+// router.get('/user_list', admin_token, user().get_list, response);
+// router.get('/user/:id', admin_token, user().details, response);
+// router.patch("/user/:id", admin_token, validateObjectId, user().active_inactive, response);
+// router.delete("/user/:id", admin_token, validateObjectId, user().remove, response);
 
 
 // manage inquery
@@ -84,12 +88,21 @@ router.put("/inquery/:id", admin_token, assign_staff_validator, inquery().assign
 
 
 // Manage client
-router.post("/client", admin_token, client().update_client, response);
-router.put("/client", admin_token, validateObjectId, client().update_client, response);
-router.get('/client_list', admin_token, client().get_list, response);
-router.get('/client/:id', admin_token, client().details, response);
-router.patch("/client/:id", admin_token, validateObjectId, client().active_inactive, response);
-router.delete("/client/:id", admin_token, validateObjectId, client().remove, response);
+router.post("/client", admin_token,common().update_profile, response);
+router.put("/client", admin_token, validateObjectId,common().update_profile, response);
+router.get('/client_list', admin_token, user().get_list, response);
+router.get('/client/:id', admin_token, user().details, response);
+router.patch("/client/:id", admin_token, validateObjectId, user().active_inactive, response);
+router.delete("/client/:id", admin_token, validateObjectId, user().remove, response);
+
+
+// Assign product
+router.post("/client_theme", admin_token, assign_theme, assign_product().add_update, response);
+router.put("/client_theme", admin_token, assign_theme, validateObjectId, assign_product().add_update, response);
+router.get('/client_theme_list', admin_token, assign_product().get_list, response);
+router.patch("/client_theme/:id", admin_token, validateObjectId, assign_product().change_status, response);
+router.delete("/client_theme/:id", admin_token, validateObjectId, assign_product().remove, response);
+
 
 
 // Manage support ticket

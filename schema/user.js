@@ -9,6 +9,7 @@ const user_schema = new Schema({
   last_name                  : { type: String,    default: ""     },
   country_code               : { type: String,    default: ""     },
   mobile                     : { type: String,    default: ""     },
+  whatsapp_number            : { type: String,    default: ""     },
   email                      : { type: String,    default: ""     },
   password                   : { type: String,    default: ""     },
   last_loggedin              : { type: Date,      default: null   }, 

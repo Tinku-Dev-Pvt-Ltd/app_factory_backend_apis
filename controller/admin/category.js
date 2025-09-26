@@ -1,5 +1,4 @@
 let mongoose = require('mongoose');
-let ObjectId = mongoose.SchemaTypes.ObjectId;
 let category = require('../../service/category');
 const { upload_s3_file } = require('../../util/helper');
 

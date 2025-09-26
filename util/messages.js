@@ -1320,6 +1320,7 @@ const social_type = {
   const theme_id_required = {en: "Theme id required"};
   const invalid_theme_id = {en: "Invalid theme id"};
   const staff_not_found = { en:"Staff member not found"};
+  const invalid_customer_id = { en:"You have enterd invalid customer id."};
 
   return {
 
@@ -1459,6 +1460,7 @@ const social_type = {
     invalid_query_id: invalid_query_id[lang],
     theme_id_required:theme_id_required[lang],
     invalid_theme_id:invalid_theme_id[lang],
-    staff_not_found:staff_not_found[lang]
+    staff_not_found:staff_not_found[lang],
+    invalid_customer_id:invalid_customer_id[lang]
   };
 };

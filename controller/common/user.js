@@ -14,8 +14,12 @@ module.exports = () => {
         console.log("\n Update profile API Hit Successfully ✅");
         try {
             let body = req.fields;
-            let { email, mobile, country_code, password } = body;
+            let role = req.role;
+            let { email, mobile, country_code, password, id } = body;
             let user_id = req.Id || null;
+            
+            if(role == 'admin' && id) user_id = id;
+
             console.log('\n =-=-=-=-=-=-=-=- req.fields =-=-=-=-=-=-=-=- ');
             console.log(req.fields)
 
